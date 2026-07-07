@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  --color-wc-green: #07C160;
+  --color-wc-green-dark: #06AD56;
+  --color-wc-bg: #EDEDED;
+  --color-wc-text: #353535;
+  --color-wc-text-secondary: #888888;
+  --color-wc-text-light: #B2B2B2;
+  --color-wc-border: #E5E5E5;
+  --color-wc-link: #576B95;
+  --color-wc-red: #E64340;
+  --color-wc-orange: #FA9D3B;
+  --color-wc-blue: #10AEFF;
+  --color-wc-purple: #7B68EE;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  background: #ffffff;
+  color: var(--color-wc-text);
+}
+
+.phone-stage {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  /* 白天光照：左上暖白日光晕（阳光直射点）+ 浅蓝灰天光渐变（带明暗方向感） */
+  background:
+    radial-gradient(circle at 25% 20%, rgba(255, 250, 240, 0.85) 0%, rgba(255, 250, 240, 0) 55%),
+    linear-gradient(155deg, #f2f7fb 0%, #e6ecf3 60%, #dde4ec 100%);
+}
+
+.phone-stage > * {
+  box-shadow: 0 25px 80px rgba(0, 0, 0, 0.5);
+  /* Phase 3：手机微倾斜，营造真人手持展示的立体感 */
+  transform: perspective(1200px) rotateY(-1.5deg) rotateX(1deg);
+  transition: transform 0.4s ease;
+  /* 入场动画：从下方淡入升起。
+     不用 forwards/both 填充——动画结束后让 transform 回归规则值，
+     否则 keyframe 末帧的倾斜会以动画填充值压住 :hover 与移动端 transform。 */
+  animation: phone-rise 0.6s ease-out;
+}
+
+/* 悬停恢复正视角，便于看清界面 */
+.phone-stage > *:hover {
+  transform: perspective(1200px) rotateY(0deg) rotateX(0deg);
+}
+
+/* 终态须保留完整倾斜 transform，避免 both 结束后覆盖基础倾斜态 */
+@keyframes phone-rise {
+  from {
+    opacity: 0;
+    transform: perspective(1200px) rotateY(-1.5deg) rotateX(1deg) translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: perspective(1200px) rotateY(-1.5deg) rotateX(1deg) translateY(0);
+  }
+}
+
+@media (max-width: 500px) {
+  .phone-stage {
+    padding: 0;
+    min-height: 100vh;
+  }
+
+  .phone-stage > * {
+    box-shadow: none;
+    /* 移动端全屏：去掉倾斜与入场动画，避免整屏歪斜 */
+    transform: none;
+    animation: none;
+  }
+}

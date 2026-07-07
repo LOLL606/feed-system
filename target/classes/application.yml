@@ -1,0 +1,26 @@
+server:
+  port: 8080
+
+spring:
+  datasource:
+    master:
+      url: jdbc:mysql://192.168.10.121:3306/feed_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+    slave:
+      enabled: true
+      url: jdbc:mysql://192.168.10.121:3307/feed_db?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&rewriteBatchedStatements=true
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.niit.feed.model
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.niit.feed: DEBUG

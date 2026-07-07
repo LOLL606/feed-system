@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.niit.feed.mapper.FeedOutboxMapper">
+
+    <!-- TODO 1（中难度）：补全 WHERE / 游标分页 / 排序 / LIMIT，参考上午 FeedInboxMapper.xml 的 findByUserId -->
+    <!-- 详见 docs/day2-b.md 第 2.2 节提示卡 1/2 -->
+    <select id="findByUserId" resultType="com.niit.feed.model.FeedOutbox">
+        SELECT o.*, p.content, u.name AS user_name
+        FROM feed_outbox o
+        JOIN feed_post p ON o.post_id = p.id
+        JOIN `user` u ON o.user_id = u.id
+        WHERE o.user_id = #{userId}
+        AND (p.visible_until IS NULL OR p.visible_until &gt; NOW())
+        <if test="cursor != null">
+            AND o.id &lt; #{cursor}
+        </if>
+        ORDER BY o.created_at DESC
+        LIMIT #{size}
+    </select>
+
+    <!-- 批量查多个大V的 outbox -->
+    <select id="findByUserIds" resultType="com.niit.feed.model.FeedOutbox">
+        SELECT o.*, p.content, u.name AS user_name
+        FROM feed_outbox o
+        JOIN feed_post p ON o.post_id = p.id
+        JOIN `user` u ON o.user_id = u.id
+        WHERE o.user_id IN
+        <foreach collection="userIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+        AND (p.visible_until IS NULL OR p.visible_until &gt; NOW())
+        <if test="cursor != null">
+            AND o.id &lt; #{cursor}
+        </if>
+        ORDER BY o.created_at DESC
+        LIMIT #{size}
+    </select>
+
+</mapper>

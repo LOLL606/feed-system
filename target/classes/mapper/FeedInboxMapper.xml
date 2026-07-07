@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.niit.feed.mapper.FeedInboxMapper">
+
+    <!-- TODO 2（中难度）：补全批量插入 SQL -->
+    <!-- 提示：使用 <foreach> 循环，collection="list" item="item" separator="," -->
+    <!-- 每条记录插入 (user_id, post_id, from_user_id) 三个字段 -->
+    <!-- 取值方式：#{item.userId}, #{item.postId}, #{item.fromUserId} -->
+    <insert id="batchInsert" parameterType="java.util.List">
+        INSERT INTO feed_inbox (user_id, post_id, from_user_id)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.userId}, #{item.postId}, #{item.fromUserId})
+        </foreach>
+    </insert>
+
+    <!-- TODO 4a（中难度）：补全读收件箱的三表 JOIN 查询 -->
+    <!-- 提示卡 1（卡 5 分钟看）：                                                           -->
+    <!--   SELECT 字段：i.*, p.content, u.name AS from_user_name                            -->
+    <!--   FROM feed_inbox i                                                                -->
+    <!--   JOIN feed_post p ON i.post_id = p.id       （取帖子内容）                          -->
+    <!--   JOIN `user` u ON i.from_user_id = u.id     （取发帖者名字，注意 user 要反引号）   -->
+    <!--   WHERE i.user_id = #{userId}                                                      -->
+    <!--   游标分页：<if test="cursor != null"> AND i.id &lt; #{cursor} </if>                -->
+    <!--   ORDER BY i.created_at DESC  LIMIT #{size}                                        -->
+    <!--                                                                                     -->
+    <!-- ⚠️ 注意：'<' 在 XML 里必须写成 &lt;（否则 XML 解析报错）                              -->
+    <select id="findByUserId" resultType="com.niit.feed.model.FeedInbox">
+        SELECT i.*,
+               p.content,
+               u.name AS from_user_name
+        FROM feed_inbox i
+        JOIN feed_post p ON i.post_id = p.id
+        JOIN `user` u ON i.from_user_id = u.id
+        WHERE i.user_id = #{userId}
+        AND (p.visible_until IS NULL OR p.visible_until &gt; NOW())
+        <if test="cursor != null">
+            AND i.id &lt; #{cursor}
+        </if>
+        ORDER BY i.is_pinned DESC, i.created_at DESC
+        LIMIT #{size}
+    </select>
+
+</mapper>
