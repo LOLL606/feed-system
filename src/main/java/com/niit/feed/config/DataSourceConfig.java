@@ -40,7 +40,7 @@ public class DataSourceConfig {
         ds.setPassword(masterPassword);
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         ds.setPoolName("master-pool");
-        ds.setMaximumPoolSize(20);
+        ds.setMaximumPoolSize(50);
         ds.setMinimumIdle(5);
         return ds;
     }
@@ -55,7 +55,7 @@ public class DataSourceConfig {
         ds.setDriverClassName("com.mysql.cj.jdbc.Driver");
         ds.setPoolName("slave-pool");
         ds.setReadOnly(true);
-        ds.setMaximumPoolSize(20);
+        ds.setMaximumPoolSize(50);
         ds.setMinimumIdle(5);
         return ds;
     }
