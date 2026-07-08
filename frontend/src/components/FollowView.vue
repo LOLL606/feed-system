@@ -14,15 +14,26 @@
           </div>
         </div>
       </div>
-      <button
-        class="px-3 py-1 border rounded text-xs cursor-pointer transition-all flex-shrink-0"
-        :class="blockedIds.has(u.id)
-          ? 'bg-wc-red text-white border-wc-red'
-          : 'bg-white text-wc-text border-wc-border hover:bg-gray-100'"
-        @click="toggleBlock(u.id)"
-      >
-        {{ blockedIds.has(u.id) ? '已屏蔽' : '屏蔽' }}
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          class="px-3 py-1 border rounded text-xs cursor-pointer transition-all flex-shrink-0"
+          :class="followingIds.has(u.id)
+            ? 'bg-wc-green text-white border-wc-green'
+            : 'bg-white text-wc-green border-wc-green hover:bg-green-50'"
+          @click="toggleFollow(u.id)"
+        >
+          {{ followingIds.has(u.id) ? '已关注' : '关注' }}
+        </button>
+        <button
+          class="px-3 py-1 border rounded text-xs cursor-pointer transition-all flex-shrink-0"
+          :class="blockedIds.has(u.id)
+            ? 'bg-wc-red text-white border-wc-red'
+            : 'bg-white text-wc-text border-wc-border hover:bg-gray-100'"
+          @click="toggleBlock(u.id)"
+        >
+          {{ blockedIds.has(u.id) ? '已屏蔽' : '屏蔽' }}
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +46,7 @@ import { avatarSVG } from '../utils/index.js'
 const props = defineProps({ user: { type: Object, required: true } })
 
 const users = ref([])
+const followingIds = ref(new Set())
 const blockedIds = ref(new Set())
 const loading = ref(false)
 
@@ -44,9 +56,24 @@ async function loadUsers() {
   loading.value = true
   try {
     users.value = await API.getUserList()
+    const fids = await API.getFollowingIds()
+    followingIds.value = new Set(fids)
+    const bids = await API.getBlockedUserIds()
+    blockedIds.value = new Set(bids)
   } finally {
     loading.value = false
   }
+}
+
+async function toggleFollow(userId) {
+  if (followingIds.value.has(userId)) {
+    await API.unfollowUser(userId)
+    followingIds.value.delete(userId)
+  } else {
+    await API.followUser(userId)
+    followingIds.value.add(userId)
+  }
+  followingIds.value = new Set(followingIds.value)
 }
 
 async function toggleBlock(userId) {

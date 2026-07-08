@@ -198,9 +198,14 @@ public class FeedService {
             }
         }
 
-        // 2. 发件箱（拉模式 — 我关注的大V）
+        // 2. 发件箱（拉模式 — 我关注的大V + 用户自己如果也是大V）
         List<Long> bigVIds = followMapper.findFollowedBigVIds(userId);
-        if (bigVIds != null && !bigVIds.isEmpty()) {
+        if (bigVIds == null) bigVIds = new ArrayList<>();
+        User currentUser = userMapper.findById(userId);
+        if (currentUser != null && currentUser.getIsBigV() && !bigVIds.contains(userId)) {
+            bigVIds.add(userId);  // 大V自己发的帖子自己也要能看到
+        }
+        if (!bigVIds.isEmpty()) {
             List<FeedOutbox> outboxList = outboxMapper.findByUserIds(bigVIds, null, size + 1);
             if (outboxList != null) {
                 for (FeedOutbox item : outboxList) {
@@ -218,7 +223,6 @@ public class FeedService {
         }
 
         // 3. 补拉（catch-up）：如果我离线 > 24h，拉取遗漏的普通用户帖子
-        User currentUser = userMapper.findById(userId);
         if (currentUser != null && currentUser.getLastActiveAt() != null) {
             Duration inactive = Duration.between(currentUser.getLastActiveAt(), LocalDateTime.now());
             if (inactive.toHours() >= 24) {

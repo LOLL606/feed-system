@@ -171,6 +171,22 @@ export async function unblockUser(targetUserId) {
     return request('POST', '/api/block', { targetUserId, action: 'unblock' });
 }
 
+export async function getBlockedUserIds() {
+    if (USE_MOCK) {
+        return [...MOCK_BLOCKED_IDS];
+    }
+    const res = await request('GET', '/api/block');
+    return res?.blockedIds || [];
+}
+
+export async function getFollowingIds() {
+    if (USE_MOCK) {
+        return [];
+    }
+    const res = await request('GET', '/api/follow/ids');
+    return res?.ids || [];
+}
+
 export async function getFollowingList() {
     if (USE_MOCK) {
         return MOCK_USERS.filter(u => u.id !== currentUserId).slice(0, 5);

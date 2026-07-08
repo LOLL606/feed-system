@@ -51,6 +51,10 @@ public class FollowService {
         return followMapper.findByUserId(userId);
     }
 
+    public List<Long> getFollowingIds(Long userId) {
+        return followMapper.findFollowingIds(userId);
+    }
+
     private void checkBigVPromotion(Long userId) {
         User user = userMapper.findById(userId);
         if (user == null || user.getIsBigV()) return;

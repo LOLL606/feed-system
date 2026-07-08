@@ -39,4 +39,11 @@ public class FollowController {
         Long userId = userService.getCurrentUserId();
         return followService.getFollowingList(userId);
     }
+
+    @GetMapping("/ids")
+    public Map<String, Object> followingIds() {
+        Long userId = userService.getCurrentUserId();
+        List<Long> ids = followService.getFollowingIds(userId);
+        return Map.of("ids", ids != null ? ids : List.of());
+    }
 }

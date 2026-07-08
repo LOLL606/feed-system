@@ -19,6 +19,9 @@ public interface FollowRelationMapper {
     @Select("SELECT user_id FROM follow_relation WHERE target_user_id = #{targetUserId}")
     List<Long> findFollowerIds(Long targetUserId);
 
+    @Select("SELECT target_user_id FROM follow_relation WHERE user_id = #{userId}")
+    List<Long> findFollowingIds(Long userId);
+
     @Select("SELECT COUNT(*) FROM follow_relation WHERE user_id = #{userId}")
     int countFollowing(Long userId);
 

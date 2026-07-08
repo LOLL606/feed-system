@@ -5,6 +5,7 @@ import com.niit.feed.model.BlockRelation;
 import com.niit.feed.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -17,6 +18,13 @@ public class BlockController {
     public BlockController(BlockRelationMapper blockMapper, UserService userService) {
         this.blockMapper = blockMapper;
         this.userService = userService;
+    }
+
+    @GetMapping
+    public Map<String, Object> getBlockedList() {
+        Long userId = userService.getCurrentUserId();
+        List<Long> blockedIds = blockMapper.findBlockedUserIds(userId);
+        return Map.of("blockedIds", blockedIds != null ? blockedIds : List.of());
     }
 
     @PostMapping
